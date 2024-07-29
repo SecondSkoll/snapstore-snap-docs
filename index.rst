@@ -41,6 +41,7 @@ Project and community
 
 The Snap Store Proxy is a member of the Snap Store family. It's a project that welcomes suggestions, fixes and constructive feedback.
 
+* `Read our Code of Conduct <https://ubuntu.com/community/ethos/code-of-conduct>`_
 * `Get the Snap Store Proxy as a snap <https://snapcraft.io/snap-store-proxy>`_
 * `Join the Discourse forum <https://forum.snapcraft.io/c/store/16>`_
 * `File a bug <https://bugs.launchpad.net/snapstore-server>`_
