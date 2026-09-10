@@ -122,7 +122,7 @@ http://test-store`. Press **Ctrl+C** to stop watching.
 
 The registered domain is also the value of the Enterprise Store's
 `proxy.domain` configuration. The status action connects to that URL from the
-Enterprise Store unit, so `test-store` must resolve from the unit as well as
+Enterprise Store unit, so `test-store` should resolve from the unit as well as
 from client devices. Find the Enterprise Store unit's IP address in `juju
 status`, replace `<STORE_UNIT_IP>` with that address, and add a temporary host
 entry to the unit:
