@@ -47,8 +47,8 @@ juju attach-resource enterprise-store \
 
 The charm installs all three snaps together. On first bootstrap only, it writes
 `proxy.assert` to
-`/var/snap/enterprise-store/common/nginx/airgap/store.assert`. Attaching a later
-bundle does not reapply the store assertion.
+`/var/snap/enterprise-store/common/nginx/airgap/store.assert`. Attaching a
+bundle later does not reapply the store assertion.
 
 ## Configure the registration bundle
 
@@ -93,8 +93,10 @@ The integration maps S3 data to the snap configuration as follows and sets
 
 ## Deploy with the Juju CLI
 
-Charmhub currently publishes the Enterprise Store charm in the `latest/edge`
-channel:
+.. note::
+
+  Charmhub currently publishes the Enterprise Store charm in the `latest/edge`
+  channel.
 
 ```bash
 juju deploy enterprise-store --channel edge \
@@ -143,100 +145,6 @@ relations:
 
 After deploying the bundle, configure the `s3-integrator` credentials and
 endpoint.
-
-## Deploy with Terraform
-
-The Juju Terraform provider does not manage local file resources directly. Use
-a `null_resource` to attach the bundle after declaring the applications and
-integrations. Provider releases before 2.2.1 cannot deploy a purely local charm,
-so this example uses the charm published on Charmhub.
-
-```hcl
-terraform {
-  required_providers {
-    juju = {
-      source  = "juju/juju"
-      version = "~> 2.2.1"
-    }
-  }
-}
-
-provider "juju" {}
-
-resource "juju_model" "offline_model" {
-  name = "offline-model"
-  cloud {
-    name   = "localhost"
-    region = "localhost"
-  }
-}
-
-resource "juju_application" "postgresql" {
-  name       = "postgresql"
-  model_uuid = juju_model.offline_model.uuid
-  charm {
-    name    = "postgresql"
-    channel = "14/stable"
-  }
-  config = { plugin_btree_gist_enable = true }
-}
-
-resource "juju_application" "enterprise_store" {
-  name       = "enterprise-store"
-  model_uuid = juju_model.offline_model.uuid
-  charm {
-    name    = "enterprise-store"
-    channel = "edge"
-  }
-  config = {
-    registration_bundle = file("${path.module}/offline-snap-store/registration_bundle.b64")
-    offline             = true
-  }
-}
-
-resource "juju_application" "s3_integrator" {
-  name       = "s3-integrator"
-  model_uuid = juju_model.offline_model.uuid
-  charm {
-    name    = "s3-integrator"
-    channel = "2/stable"
-  }
-}
-
-resource "juju_integration" "database" {
-  model_uuid = juju_model.offline_model.uuid
-  application {
-    name     = juju_application.postgresql.name
-    endpoint = "database"
-  }
-  application {
-    name     = juju_application.enterprise_store.name
-    endpoint = "database"
-  }
-}
-
-resource "juju_integration" "s3_credentials" {
-  model_uuid = juju_model.offline_model.uuid
-  application {
-    name     = juju_application.enterprise_store.name
-    endpoint = "s3-credentials"
-  }
-  application {
-    name     = juju_application.s3_integrator.name
-    endpoint = "s3-credentials"
-  }
-}
-
-resource "null_resource" "store_bundle" {
-  triggers = {
-    app_id      = juju_application.enterprise_store.id
-    bundle_hash = filemd5("${path.module}/offline-snap-store.tar.gz")
-  }
-  provisioner "local-exec" {
-    command = "juju attach-resource enterprise-store store-bundle=${path.module}/offline-snap-store.tar.gz"
-  }
-}
-```
 
 For a multi-unit deployment, continue with {doc}`Deploy a highly available
 charmed store <deploy-charmed-ha>`. See the {doc}`charm reference

@@ -37,8 +37,8 @@ juju integrate enterprise-store:haproxy-route haproxy:haproxy-route
 
 The registration bundle's domain must be HAProxy's public hostname, and its edge
 certificate must cover that hostname. Do not set `certificate` or `private_key`
-on the Enterprise Store charm while this integration exists; the unit becomes
-blocked because HAProxy owns TLS termination.
+on the Enterprise Store charm while this integration exists, or the unit will become
+blocked because HAProxy owns the TLS termination.
 
 ## Scale out
 
@@ -86,55 +86,6 @@ relations:
   - self-signed-certificates:certificates
 - - enterprise-store:haproxy-route
   - haproxy:haproxy-route
-```
-
-## Deploy with Terraform
-
-Add these resources to the Terraform configuration for the base deployment.
-Replace `base_model` with its model resource name, and set `units = 3` on the
-Enterprise Store application.
-
-```hcl
-resource "juju_application" "self_signed_certificates" {
-  name       = "self-signed-certificates"
-  model_uuid = juju_model.base_model.uuid
-  charm {
-    name = "self-signed-certificates"
-  }
-}
-
-resource "juju_application" "haproxy" {
-  name       = "haproxy"
-  model_uuid = juju_model.base_model.uuid
-  charm {
-    name    = "haproxy"
-    channel = "2.8/stable"
-  }
-}
-
-resource "juju_integration" "haproxy_self_signed" {
-  model_uuid = juju_model.base_model.uuid
-  application {
-    name     = juju_application.haproxy.name
-    endpoint = "certificates"
-  }
-  application {
-    name     = juju_application.self_signed_certificates.name
-    endpoint = "certificates"
-  }
-}
-
-resource "juju_integration" "haproxy_route" {
-  model_uuid = juju_model.base_model.uuid
-  application {
-    name     = juju_application.haproxy.name
-    endpoint = "haproxy-route"
-  }
-  application {
-    name     = juju_application.enterprise_store.name
-    endpoint = "haproxy-route"
-  }
-}
 ```
 
 For the snap-level alternative and reverse-proxy considerations, see

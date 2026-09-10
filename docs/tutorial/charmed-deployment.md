@@ -74,7 +74,7 @@ Install `store-admin`, then register the domain that the test device will use:
 :copy:
 
 sudo snap install store-admin
-store-admin register http://test-store > registration_bundle.b64
+store-admin register http://test-store registration_bundle.b64
 ```
 
 Registration prompts you to authenticate with Ubuntu One in a browser. See

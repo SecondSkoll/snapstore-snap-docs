@@ -21,18 +21,11 @@ for controller setup. For a guided local deployment, follow
 Register the store with `store-admin` against the domain that devices will use:
 
 ```bash
-store-admin register https://store.example.com
+store-admin register https://store.example.com registration_bundle.b64
 ```
 
 Supply the generated `registration_bundle.b64` to the charm. See
 {doc}`Registration <register>` for registration concepts.
-
-The charm requires PostgreSQL through the `database` integration. Enable
-`btree_gist` on the PostgreSQL charm so that the extension is available:
-
-```bash
-juju config postgresql plugin_btree_gist_enable=true
-```
 
 ## Deploy with the Juju CLI
 
@@ -48,12 +41,17 @@ juju config enterprise-store \
     registration_bundle="$(cat registration_bundle.b64)"
 ```
 
-Run `juju status` until the Enterprise Store unit is active, then use
+.. note::
+
+  The charm requires PostgreSQL through the `database` integration. This is why
+  `btree_gist` is enabled on the PostgreSQL charm so.
+
+Run `juju status --watch 5s` until the Enterprise Store unit is active, then use
 {doc}`Configure a device to use the Enterprise Store <devices>`.
 
 ## Deploy with a Juju bundle
 
-Save the following as `bundle.yaml`, replace the registration bundle value, and
+Save the following as `bundle.yaml`, inserting the registration bundle value, and
 deploy it with `juju deploy ./bundle.yaml`:
 
 ```yaml
@@ -74,68 +72,6 @@ applications:
 relations:
 - - postgresql:database
   - enterprise-store:database
-```
-
-## Deploy with Terraform
-
-The following configuration uses the `juju/juju` Terraform provider. Put the
-registration bundle beside the Terraform configuration before applying it.
-
-```hcl
-terraform {
-  required_providers {
-    juju = {
-      source  = "juju/juju"
-      version = "~> 2.2.1"
-    }
-  }
-}
-
-provider "juju" {}
-
-resource "juju_model" "proxy_model" {
-  name = "proxy-model"
-  cloud {
-    name   = "localhost"
-    region = "localhost"
-  }
-}
-
-resource "juju_application" "postgresql" {
-  name       = "postgresql"
-  model_uuid = juju_model.proxy_model.uuid
-  charm {
-    name    = "postgresql"
-    channel = "14/stable"
-  }
-  config = {
-    plugin_btree_gist_enable = true
-  }
-}
-
-resource "juju_application" "enterprise_store" {
-  name       = "enterprise-store"
-  model_uuid = juju_model.proxy_model.uuid
-  charm {
-    name    = "enterprise-store"
-    channel = "edge"
-  }
-  config = {
-    registration_bundle = file("${path.module}/registration_bundle.b64")
-  }
-}
-
-resource "juju_integration" "database" {
-  model_uuid = juju_model.proxy_model.uuid
-  application {
-    name     = juju_application.postgresql.name
-    endpoint = "database"
-  }
-  application {
-    name     = juju_application.enterprise_store.name
-    endpoint = "database"
-  }
-}
 ```
 
 See the {doc}`charm reference </reference/charm>` for configuration and

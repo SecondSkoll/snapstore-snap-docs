@@ -10,11 +10,6 @@ with Juju. It provides declarative configuration and supports multiple units
 for high availability. The charm is available from
 [Charmhub](https://charmhub.io/enterprise-store) and requires Juju 3.x.
 
-Use proxy mode when the units can reach the Snap Store. Use offline mode for an
-air-gapped deployment, supplying the installation snaps as a resource and using
-S3-compatible blob storage. Add HAProxy and multiple units to either mode for a
-highly available deployment.
-
 | **How-to guide** | Get stuff done |
 |---|---|
 | [Deploy in proxy mode](deploy-charmed-proxy.md) | Deploy the default online proxy configuration |

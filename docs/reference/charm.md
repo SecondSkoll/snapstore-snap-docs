@@ -5,17 +5,6 @@ description: Configuration options, integrations, actions, resources, and status
 
 # Enterprise Store charm reference
 
-## Deployment facts
-
-| Property | Value |
-|---|---|
-| Charm | [`enterprise-store`](https://charmhub.io/enterprise-store) |
-| Platform | Ubuntu 24.04 LTS, AMD64 |
-| Current published channel | `latest/edge` |
-
-Check Charmhub before deployment for the currently available channels and
-revisions.
-
 ## Configuration options
 
 | Option | Type | Default | Description |
