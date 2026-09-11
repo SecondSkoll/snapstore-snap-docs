@@ -93,6 +93,7 @@ The integration maps S3 data to the snap configuration as follows and sets
 
 ## Deploy with the Juju CLI
 
+```
 juju deploy enterprise-store --channel edge \
     --config offline=true \
     --resource store-bundle=./offline-snap-store.tar.gz
