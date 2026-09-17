@@ -21,7 +21,7 @@ for controller setup. For a guided local deployment, follow
 Register the store with `store-admin` against the domain that devices will use:
 
 ```bash
-store-admin register https://store.example.com registration_bundle.b64
+store-admin register https://store.example.com --output-file registration_bundle.b64
 ```
 
 Supply the generated `registration_bundle.b64` to the charm. See
